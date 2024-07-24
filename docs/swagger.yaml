@@ -1,0 +1,468 @@
+definitions:
+  controller.LoginInput:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  controller.MenuWithQuantity:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      imageurl:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      quantity:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  controller.RegisterInput:
+    properties:
+      password:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - role
+    - username
+    type: object
+  models.Cart:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      total_price:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.CartItem:
+    properties:
+      cart_id:
+        type: integer
+      id:
+        type: integer
+      menu_id:
+        type: integer
+      qty:
+        type: integer
+    type: object
+  models.Menu:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      imageurl:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+paths:
+  /carts:
+    get:
+      description: Menginisialisasi cart kosong yang nanti akan di isi oleh user id
+        tertentu
+      parameters:
+      - description: user id
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cart'
+      summary: Get empty cart
+      tags:
+      - Cart
+  /carts/{cart_id}:
+    delete:
+      description: delete an entire cart along with all its menus
+      parameters:
+      - description: cart_id
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: delete cart
+      tags:
+      - Cart
+  /carts/{cart_id}/empty:
+    delete:
+      description: remove all menus from an existing cart
+      parameters:
+      - description: cart_id
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cart'
+      summary: empty cart
+      tags:
+      - Cart
+  /carts/{cart_id}/menus/{menu_id}:
+    delete:
+      description: delete menu from an existing cart
+      parameters:
+      - description: cart_id
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      - description: menu_id
+        in: path
+        name: menu_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cart'
+      summary: delete menu from cart
+      tags:
+      - Cart
+    post:
+      description: add menu to an existing cart
+      parameters:
+      - description: cart_id
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      - description: menu_id
+        in: path
+        name: menu_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cart'
+      summary: add menu to cart
+      tags:
+      - Cart
+    put:
+      description: update menu quantity in an existing cart or remove if quantity
+        is 0
+      parameters:
+      - description: cart_id
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      - description: menu_id
+        in: path
+        name: menu_id
+        required: true
+        type: string
+      - description: quantity
+        in: formData
+        name: quantity
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Cart'
+      summary: update menu in cart
+      tags:
+      - Cart
+  /carts/{id}/menus:
+    get:
+      description: Get menus from a specific cart using cart id
+      parameters:
+      - description: id cart
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controller.MenuWithQuantity'
+            type: array
+      summary: Get menus by cart id
+      tags:
+      - Cart
+  /login:
+    post:
+      description: login with username and password
+      parameters:
+      - description: the body to login a user
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login as a user
+      tags:
+      - Auth
+  /menus:
+    get:
+      description: Get all list of menus
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Menu'
+            type: array
+      summary: Get all menu
+      tags:
+      - Menu
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new menu
+      parameters:
+      - description: Menu name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Menu price
+        in: formData
+        name: price
+        required: true
+        type: string
+      - description: Menu image
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: 'Authorization, how to input in swagger: ''Bearer <token>'' '
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Menu'
+      security:
+      - BearerToken: []
+      summary: Create new menu
+      tags:
+      - Menu
+  /menus/{id}:
+    delete:
+      description: Delete a single menu by id
+      parameters:
+      - description: id menu
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Authorization, how to input in swagger: ''Bearer <token>'' '
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - BearerToken: []
+      summary: Delete a menu
+      tags:
+      - Menu
+    get:
+      description: Get a menu by ID
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Menu'
+      summary: Get menu by ID
+      tags:
+      - Menu
+    put:
+      consumes:
+      - multipart/form-data
+      description: update menu
+      parameters:
+      - description: id menu
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: nama menu
+        in: formData
+        name: nama
+        type: string
+      - description: harga menu
+        in: formData
+        name: price
+        type: string
+      - description: gambar menu
+        in: formData
+        name: image
+        type: file
+      - description: 'Authorization, how to input in swagger: ''Bearer <token>'' '
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Menu'
+      security:
+      - BearerToken: []
+      summary: update menu
+      tags:
+      - Menu
+  /menus/{id}/cart-items:
+    get:
+      description: get cart items by menu ID
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CartItem'
+            type: array
+      summary: get cart items by menu ID
+      tags:
+      - Menu
+  /menus/{id}/carts:
+    get:
+      description: get cart by menu ID
+      parameters:
+      - description: Menu ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Cart'
+            type: array
+      summary: get cart by menu ID
+      tags:
+      - Menu
+  /register:
+    post:
+      description: registering a user from public access
+      parameters:
+      - description: body to register a new user
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RegisterInput'
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: register a new user
+      tags:
+      - Auth
+swagger: "2.0"
